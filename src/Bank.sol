@@ -2,13 +2,12 @@
 
 pragma solidity ^0.8.25;
 
-contract Bank{
-    
+contract Bank {
     //events
     event depositSuccessfull(address indexed account, uint256 amount);
     event withdrawSuccessfull(address indexed account, uint256 amount);
 
-    //errors    
+    //errors
     error depositMismatch();
     error amountCannotBeZero();
     error insufficientFunds();
@@ -16,20 +15,20 @@ contract Bank{
     error accountNotFound();
 
     // variables
-    mapping (address => uint256) private accountBalances;
+    mapping(address => uint256) private accountBalances;
 
-    function deposit(uint256 amount) public payable{
-        if(amount <= 0) {
+    function deposit(uint256 amount) public payable {
+        if (amount <= 0) {
             revert amountCannotBeZero();
         }
-        if(msg.value != amount) {
+        if (msg.value != amount) {
             revert depositMismatch();
         }
         accountBalances[msg.sender] += amount;
-         emit depositSuccessfull(msg.sender, amount);
+        emit depositSuccessfull(msg.sender, amount);
     }
 
-    function withdraw(uint256 amount) public{
+    function withdraw(uint256 amount) public {
         if (accountBalances[msg.sender] < amount) {
             revert insufficientFunds();
         }
@@ -38,17 +37,16 @@ contract Bank{
         if (accountBalances[msg.sender] == 0) {
             delete accountBalances[msg.sender];
         }
-        (bool success, ) = msg.sender.call{value: amount}("");
-        if(!success) {
+        (bool success,) = msg.sender.call{value: amount}("");
+        if (!success) {
             revert withdrawFailed();
         }
 
         emit withdrawSuccessfull(msg.sender, amount);
-
     }
-    
-    function checkBalance(address user) public view returns(uint256){
-        if(accountBalances[user] == 0) {
+
+    function checkBalance(address user) public view returns (uint256) {
+        if (accountBalances[user] == 0) {
             revert insufficientFunds();
         }
         return accountBalances[user];
